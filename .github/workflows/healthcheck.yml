@@ -1,0 +1,74 @@
+name: Website caretaker
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+    inputs:
+      simulate:
+        description: Failure simulation
+        type: choice
+        options: [none, down, slow, supabase, ssl]
+        default: none
+      dry_run:
+        description: Do not create issues, alerts, fixes or rollbacks
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: website-caretaker
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash-lite' }}
+      CARETAKER_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      CARETAKER_SIMULATE: ${{ github.event_name == 'workflow_dispatch' && inputs.simulate != 'none' && inputs.simulate || '' }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 20
+      - name: Check website
+        id: health
+        continue-on-error: true
+        run: node caretaker/healthcheck.mjs
+      - name: Close recovered incidents
+        if: steps.health.outcome == 'success' && env.CARETAKER_DRY_RUN != 'true'
+        run: node caretaker/recover.mjs
+      - name: Create or update incident
+        if: steps.health.outcome == 'failure'
+        id: incident
+        run: node caretaker/incident.mjs
+      - name: Diagnose incident
+        if: steps.health.outcome == 'failure' && steps.incident.outputs.paused != 'true' && fromJSON(steps.incident.outputs.ai_runs || '0') < 3
+        id: triage
+        env:
+          ISSUE_NUMBER: ${{ steps.incident.outputs.issue_number }}
+        run: node caretaker/triage.mjs
+      - name: Safe rollback
+        if: steps.triage.outputs.action == 'rollback' && steps.incident.outputs.confirmed_failures >= 3 && env.CARETAKER_DRY_RUN != 'true'
+        env:
+          ISSUE_NUMBER: ${{ steps.incident.outputs.issue_number }}
+          CONFIRMED_FAILURES: ${{ steps.incident.outputs.confirmed_failures }}
+        run: node caretaker/rollback.mjs
+      - name: Wait for deployment
+        if: steps.triage.outputs.action == 'rollback' && steps.incident.outputs.confirmed_failures >= 3 && env.CARETAKER_DRY_RUN != 'true'
+        run: sleep 300
+      - name: Recheck after rollback
+        if: steps.triage.outputs.action == 'rollback' && steps.incident.outputs.confirmed_failures >= 3 && env.CARETAKER_DRY_RUN != 'true'
+        env:
+          CARETAKER_RETRIES: 1
+          CARETAKER_RETRY_DELAY_MS: 0
+        run: node caretaker/healthcheck.mjs

@@ -1,0 +1,26 @@
+name: Validate caretaker
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: node caretaker/validate-site.mjs
+      - name: Verify simulated failures
+        shell: bash
+        run: |
+          for kind in down slow supabase ssl; do
+            if CARETAKER_RETRIES=1 CARETAKER_RETRY_DELAY_MS=0 node caretaker/healthcheck.mjs --simulate="$kind"; then
+              echo "Simulation $kind unexpectedly passed"
+              exit 1
+            fi
+          done

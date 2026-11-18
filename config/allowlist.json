@@ -1,0 +1,18 @@
+{
+  "editable": [
+    "dist/*.html",
+    "dist/*.css",
+    "dist/*.js"
+  ],
+  "rollback": [
+    "dist/"
+  ],
+  "never": [
+    ".github/",
+    ".openai/",
+    "config/",
+    "caretaker/",
+    "docs/"
+  ],
+  "maxAiPatchLines": 200
+}
