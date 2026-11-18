@@ -2,7 +2,7 @@
 
 ## Public website
 
-Current URL: https://cube-interiors-kerala.forgivingdumpling32.chatgpt.site/
+Current URL: https://cube-interiors-website.pages.dev/
 
 Expected text: `CUBE`
 

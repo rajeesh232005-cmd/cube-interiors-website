@@ -2,7 +2,7 @@
   "sites": [
     {
       "name": "CUBE Interiors",
-      "url": "https://cube-interiors-kerala.forgivingdumpling32.chatgpt.site/",
+      "url": "https://cube-interiors-website.pages.dev/",
       "expectedText": "CUBE",
       "timeoutMs": 10000,
       "slowMs": 5000,
