@@ -13,6 +13,7 @@ Static website and zero-cost caretaker configuration for CUBE Interiors.
 4. Optionally add the repository variable `GEMINI_MODEL`; the default is `gemini-2.5-flash-lite`.
 5. In **Actions**, run **Validate caretaker**.
 6. Run **Website caretaker** with each simulation. Leave **dry_run** enabled.
+   To verify notifications without creating an incident, enable **send_test_alert**.
 7. After Cloudflare Pages is live, replace the URL in `config/sites.json` and `RUNBOOK.md` with the Cloudflare or custom-domain URL.
 8. Disable the existing ChatGPT Site only after the replacement has passed all checks.
 

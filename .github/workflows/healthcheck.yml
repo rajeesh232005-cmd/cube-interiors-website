@@ -14,6 +14,10 @@ on:
         description: Do not create issues, alerts, fixes or rollbacks
         type: boolean
         default: true
+      send_test_alert:
+        description: Send one harmless notification test instead of checking the website
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -41,7 +45,11 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 20
+      - name: Send test alert
+        if: github.event_name == 'workflow_dispatch' && inputs.send_test_alert
+        run: node caretaker/test-notify.mjs
       - name: Check website
+        if: "github.event_name != 'workflow_dispatch' || !inputs.send_test_alert"
         id: health
         continue-on-error: true
         run: node caretaker/healthcheck.mjs
