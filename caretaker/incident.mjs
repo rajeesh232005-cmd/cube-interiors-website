@@ -1,4 +1,4 @@
-import { failureSummary, githubRequest, readJson, setOutput, telegram, writeJson } from './common.mjs';
+import { failureSummary, githubRequest, notify, readJson, setOutput, writeJson } from './common.mjs';
 
 const report = readJson(process.env.CARETAKER_REPORT || 'work/health-report.json');
 const dryRun = process.env.CARETAKER_DRY_RUN === 'true';
@@ -29,7 +29,7 @@ const body = `${marker}\n${failureMarker}\n## Confirmed website failure\n\n${sum
 if (!issue) {
   issue = await githubRequest('/issues', { method: 'POST', body: JSON.stringify({ title, body, labels: ['incident'] }) });
   isNew = true;
-  await telegram(`CUBE website incident\n${summary}\n${issue.html_url}`);
+  await notify(`🚨 CUBE website incident\n${summary}\n${issue.html_url}`);
 } else {
   await githubRequest(`/issues/${issue.number}/comments`, { method: 'POST', body: JSON.stringify({ body }) });
 }

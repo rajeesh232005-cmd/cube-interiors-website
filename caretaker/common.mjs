@@ -47,6 +47,28 @@ export async function telegram(message) {
   return true;
 }
 
+export async function discord(message) {
+  const webhook = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhook) return false;
+  const response = await fetch(webhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      content: sanitize(message).slice(0, 2000),
+      allowed_mentions: { parse: [] }
+    })
+  });
+  if (!response.ok) throw new Error(`Discord delivery failed with status ${response.status}.`);
+  return true;
+}
+
+export async function notify(message) {
+  const results = await Promise.allSettled([discord(message), telegram(message)]);
+  const failure = results.find(result => result.status === 'rejected');
+  if (failure) throw failure.reason;
+  return results.some(result => result.status === 'fulfilled' && result.value);
+}
+
 export function failureSummary(report) {
   return report.results.filter(item => !item.ok)
     .map(item => `${item.name}: ${item.failureType} — ${item.message}`).join('\n');

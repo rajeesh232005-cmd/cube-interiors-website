@@ -12,7 +12,7 @@ The caretaker may automatically revert a recent commit only when that commit cha
 
 ## Contacts
 
-Telegram alerts are delivered using repository secrets. Do not put bot tokens, chat IDs or API keys in this file.
+Discord alerts are delivered through the `DISCORD_WEBHOOK_URL` repository secret. Telegram remains an optional fallback. Do not put webhook URLs, bot tokens, chat IDs or API keys in this file.
 
 ## Temporary form test
 

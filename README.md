@@ -7,9 +7,9 @@ Static website and zero-cost caretaker configuration for CUBE Interiors.
 1. Create a GitHub repository and push this project.
 2. Create a Cloudflare Pages project connected to that repository. Use no build command and set the output directory to `dist`.
 3. In GitHub **Settings → Secrets and variables → Actions**, add:
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_CHAT_ID`
+   - `DISCORD_WEBHOOK_URL`
    - `GEMINI_API_KEY`
+   - Optional Telegram fallback: `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`
 4. Optionally add the repository variable `GEMINI_MODEL`; the default is `gemini-2.5-flash-lite`.
 5. In **Actions**, run **Validate caretaker**.
 6. Run **Website caretaker** with each simulation. Leave **dry_run** enabled.
@@ -20,7 +20,7 @@ Static website and zero-cost caretaker configuration for CUBE Interiors.
 
 - Confirm the scheduled workflow ran during the last 24 hours.
 - Run one dry-run `down` simulation.
-- Confirm Telegram and Gemini free-tier quotas remain available.
+- Confirm Discord alerts and Gemini free-tier quotas remain available.
 - Review open incidents and dependency updates.
 
 ## Known limits
