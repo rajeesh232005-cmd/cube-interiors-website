@@ -11,7 +11,7 @@ for (const file of files) {
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]);
   for (const id of new Set(ids)) if (ids.filter(value => value === id).length > 1) errors.push(`${file}: duplicate id ${id}`);
   for (const match of html.matchAll(/(?:href|src)="([^"#]+)"/g)) {
-    const value = match[1].split('#')[0];
+    const value = match[1].split(/[?#]/)[0];
     if (/^(?:https?:|mailto:|tel:)/.test(value) || value.startsWith('/api/')) continue;
     if (!fs.existsSync(path.resolve(root, value.replace(/^\/+/, '')))) errors.push(`${file}: missing ${value}`);
   }
