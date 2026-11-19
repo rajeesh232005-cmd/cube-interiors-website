@@ -2,6 +2,22 @@
   "version": 1,
   "projects": [
     {
+      "title": "Oak After Dark",
+      "category": "residential",
+      "location": "kannur",
+      "description": "Warm light falls across ivory linen and a built-in oak wardrobe. Beyond the window, palms stand against a deep blue sky",
+      "images": [],
+      "id": "oak-after-dark-mwnmec50",
+      "status": "draft",
+      "archived": false,
+      "createdAt": "2026-11-19T14:03:07.380Z",
+      "updatedAt": "2026-11-19T14:03:07.380Z",
+      "updatedBy": {
+        "id": "754349337718423582",
+        "name": "Neo"
+      }
+    },
+    {
       "id": "living-thoughtfully-composed",
       "title": "Living, thoughtfully composed",
       "category": "residential",
