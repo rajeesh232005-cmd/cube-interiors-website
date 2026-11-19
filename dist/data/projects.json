@@ -6,12 +6,20 @@
       "category": "residential",
       "location": "kannur",
       "description": "Warm light falls across ivory linen and a built-in oak wardrobe. Beyond the window, palms stand against a deep blue sky",
-      "images": [],
+      "images": [
+        {
+          "id": "mwnmgdks-7c975f7e",
+          "file": "assets/projects/oak-after-dark-mwnmgdks-7c975f7e.jpg",
+          "alt": "A low oak bed dressed in ivory linen anchors this small modern bedroom. A built-in wardrobe with sliding wooden doors makes the most of the narrow space beside the bed. Above a floating shelf, a wall lamp casts soft light across the textured wall, wh",
+          "caption": "Warm oak and quiet nights.",
+          "deleted": false
+        }
+      ],
       "id": "oak-after-dark-mwnmec50",
       "status": "draft",
       "archived": false,
       "createdAt": "2026-11-19T14:03:07.380Z",
-      "updatedAt": "2026-11-19T14:03:07.380Z",
+      "updatedAt": "2026-11-19T14:04:45.350Z",
       "updatedBy": {
         "id": "754349337718423582",
         "name": "Neo"
