@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "projects": [
+    {
+      "id": "living-thoughtfully-composed",
+      "title": "Living, thoughtfully composed",
+      "category": "residential",
+      "location": "Ulikkal & Kannur",
+      "description": "A warm contemporary living space shaped around comfort, texture and everyday use.",
+      "status": "published",
+      "archived": false,
+      "createdAt": "2026-11-19T00:00:00.000Z",
+      "updatedAt": "2026-11-19T00:00:00.000Z",
+      "images": [
+        {
+          "id": "living-cover",
+          "file": "assets/living.jpg",
+          "alt": "Warm contemporary living room interior",
+          "caption": "Residential interiors",
+          "deleted": false
+        }
+      ]
+    },
+    {
+      "id": "heart-of-your-home",
+      "title": "The heart of your home",
+      "category": "kitchens",
+      "location": "Ulikkal & Kannur",
+      "description": "A modular kitchen direction balancing useful storage, natural finishes and comfortable movement.",
+      "status": "published",
+      "archived": false,
+      "createdAt": "2026-11-19T00:00:00.000Z",
+      "updatedAt": "2026-11-19T00:00:00.000Z",
+      "images": [
+        {
+          "id": "kitchen-cover",
+          "file": "assets/kitchen.jpg",
+          "alt": "Timber and muted teal modular kitchen",
+          "caption": "Modular kitchens",
+          "deleted": false
+        }
+      ]
+    },
+    {
+      "id": "best-work-space",
+      "title": "Space to do your best work",
+      "category": "commercial",
+      "location": "Ulikkal & Kannur",
+      "description": "A composed commercial reception with a welcoming material palette and a clear sense of arrival.",
+      "status": "published",
+      "archived": false,
+      "createdAt": "2026-11-19T00:00:00.000Z",
+      "updatedAt": "2026-11-19T00:00:00.000Z",
+      "images": [
+        {
+          "id": "office-cover",
+          "file": "assets/office.jpg",
+          "alt": "Modern commercial reception interior",
+          "caption": "Commercial spaces",
+          "deleted": false
+        }
+      ]
+    }
+  ]
+}

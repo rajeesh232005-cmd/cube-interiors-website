@@ -210,3 +210,95 @@ if (form) {
   addEventListener('pagehide', stopScroll);
   reduceMotion.addEventListener('change', stopScroll);
 })();
+
+// Load projects maintained through the private CUBE Website Manager.
+async function loadManagedGallery() {
+  const grid = document.querySelector('.gallery-grid');
+  if (!grid) return;
+  try {
+    const response = await fetch('data/projects.json', { cache: 'no-cache' });
+    if (!response.ok) return;
+    const data = await response.json();
+    const projects = (data.projects || []).filter(project => project.status === 'published' && !project.archived && project.images?.some(image => !image.deleted));
+    if (!projects.length) return;
+    grid.textContent = '';
+
+    const dialog = document.createElement('dialog');
+    dialog.className = 'project-lightbox';
+    dialog.innerHTML = '<button class="lightbox-close" type="button" aria-label="Close project gallery">×</button><div class="lightbox-stage"><button class="lightbox-nav previous" type="button" aria-label="Previous image">Previous</button><figure><img alt=""><figcaption><strong></strong><span></span></figcaption></figure><button class="lightbox-nav next" type="button" aria-label="Next image">Next</button></div>';
+    document.body.append(dialog);
+    const lightboxImage = dialog.querySelector('img');
+    const lightboxTitle = dialog.querySelector('strong');
+    const lightboxCaption = dialog.querySelector('figcaption span');
+    const previous = dialog.querySelector('.previous');
+    const next = dialog.querySelector('.next');
+    let activeImages = [];
+    let activeIndex = 0;
+    let activeProject = null;
+    const updateLightbox = () => {
+      const image = activeImages[activeIndex];
+      lightboxImage.src = image.file;
+      lightboxImage.alt = image.alt;
+      lightboxTitle.textContent = activeProject.title;
+      lightboxCaption.textContent = image.caption || `${activeIndex + 1} of ${activeImages.length}`;
+      previous.hidden = next.hidden = activeImages.length < 2;
+    };
+    const move = amount => { activeIndex = (activeIndex + amount + activeImages.length) % activeImages.length; updateLightbox(); };
+    previous.addEventListener('click', () => move(-1));
+    next.addEventListener('click', () => move(1));
+    dialog.querySelector('.lightbox-close').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') move(-1); if (event.key === 'ArrowRight') move(1); });
+
+    projects.forEach(project => {
+      const images = project.images.filter(image => !image.deleted);
+      const article = document.createElement('article');
+      article.className = 'gallery-card reveal-ready is-visible';
+      article.dataset.category = project.category;
+      const art = document.createElement('div');
+      art.className = 'gallery-art';
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'gallery-open';
+      open.setAttribute('aria-label', `Open ${project.title} project gallery`);
+      const image = document.createElement('img');
+      image.src = images[0].file;
+      image.alt = images[0].alt;
+      image.loading = 'lazy';
+      image.decoding = 'async';
+      open.append(image);
+      if (images.length > 1) {
+        const count = document.createElement('span');
+        count.className = 'image-count';
+        count.textContent = `${images.length} images`;
+        open.append(count);
+      }
+      open.addEventListener('click', () => {
+        activeProject = project;
+        activeImages = images;
+        activeIndex = 0;
+        updateLightbox();
+        dialog.showModal();
+      });
+      art.append(open);
+      const caption = document.createElement('div');
+      caption.className = 'gallery-caption';
+      const category = document.createElement('span');
+      category.textContent = project.location || ({ residential: 'Residential interiors', kitchens: 'Modular kitchens', commercial: 'Commercial spaces' })[project.category];
+      const heading = document.createElement('h3');
+      heading.textContent = project.title;
+      const description = document.createElement('p');
+      description.textContent = project.description || '';
+      caption.append(category, heading);
+      if (project.description) caption.append(description);
+      article.append(art, caption);
+      grid.append(article);
+    });
+    const status = document.getElementById('gallery-status');
+    if (status) status.textContent = `Showing ${projects.length} project${projects.length === 1 ? '' : 's'}`;
+  } catch {
+    // The existing gallery remains visible if managed project data is unavailable.
+  }
+}
+
+loadManagedGallery();

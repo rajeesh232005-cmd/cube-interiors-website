@@ -1,4 +1,4 @@
 {
-  "maxAssetBytes": 500000,
-  "maxTotalAssetBytes": 1200000
+  "maxAssetBytes": 800000,
+  "maxTotalAssetBytes": 25000000
 }

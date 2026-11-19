@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#493328">
+  <title>CUBE Website Manager</title>
+  <link rel="stylesheet" href="manager.css">
+  <script defer src="manager.js"></script>
+</head>
+<body>
+  <a class="skip" href="#manager-main">Skip to manager</a>
+  <header class="manager-header">
+    <a class="manager-brand" href="index.html" aria-label="Return to CUBE website">
+      <span class="manager-logo"><img src="assets/cube-logo.png" alt="CUBE" width="1024" height="1024"></span>
+      <span><strong>Website Manager</strong><small>Projects &amp; gallery</small></span>
+    </a>
+    <div id="user-area" class="user-area" hidden>
+      <img id="user-avatar" alt="" width="38" height="38">
+      <span id="user-name"></span>
+      <button class="quiet-button" id="logout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main id="manager-main" class="manager-shell">
+    <section id="loading-panel" class="state-panel" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <h1>Opening CUBE Website Manager</h1>
+      <p>Checking your secure Discord access.</p>
+    </section>
+
+    <section id="login-panel" class="state-panel" hidden>
+      <p class="eyebrow">Private team access</p>
+      <h1>Manage CUBE projects and images.</h1>
+      <p>Sign in with the Discord account that has the <strong>site management</strong> role.</p>
+      <a class="primary-button" href="/api/auth/login">Continue with Discord</a>
+      <p class="small-copy">The manager checks only your Discord identity, server membership and assigned roles. It does not read messages or channels.</p>
+    </section>
+
+    <section id="setup-panel" class="state-panel" hidden>
+      <p class="eyebrow">One-time setup required</p>
+      <h1>The manager is installed but not connected.</h1>
+      <p id="setup-message">Complete the Discord and Cloudflare setup before sharing this link with the team.</p>
+    </section>
+
+    <div id="manager-app" hidden>
+      <section class="manager-intro">
+        <div>
+          <p class="eyebrow">CUBE content studio</p>
+          <h1>Projects, images and descriptions.</h1>
+          <p>Prepare changes here. Published projects appear automatically in the public gallery after deployment.</p>
+        </div>
+        <div class="intro-actions">
+          <a class="quiet-button" href="gallery.html" target="_blank" rel="noopener">View live gallery</a>
+          <button class="primary-button" id="show-create" type="button">Add project</button>
+        </div>
+      </section>
+
+      <section id="create-panel" class="editor-panel" hidden>
+        <div class="panel-heading">
+          <div><p class="eyebrow">New project</p><h2>Add project details</h2></div>
+          <button class="icon-button" id="cancel-create" type="button" aria-label="Close new project form">×</button>
+        </div>
+        <form id="create-project" class="manager-form">
+          <div class="field-row">
+            <label>Project name<input name="title" required maxlength="120" placeholder="Kannur family living room"></label>
+            <label>Category<select name="category" required><option value="residential">Residential</option><option value="kitchens">Kitchen</option><option value="commercial">Commercial</option></select></label>
+          </div>
+          <label>Location<input name="location" maxlength="160" placeholder="Kannur, Kerala"></label>
+          <label>Description<textarea name="description" maxlength="1500" rows="4" placeholder="Describe the space, materials and purpose."></textarea></label>
+          <div class="form-actions"><button class="primary-button" type="submit">Create draft project</button></div>
+        </form>
+      </section>
+
+      <section class="project-section">
+        <div class="project-toolbar">
+          <div><p class="eyebrow">Website projects</p><h2>Manage the gallery</h2></div>
+          <label class="search-field"><span>Search projects</span><input id="project-search" type="search" placeholder="Search by name or location"></label>
+        </div>
+        <div id="manager-status" class="manager-status" aria-live="polite"></div>
+        <div id="project-list" class="project-list"></div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

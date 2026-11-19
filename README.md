@@ -5,6 +5,7 @@ Static website and zero-cost caretaker configuration for CUBE Interiors.
 ## Owner guides
 
 - [How to update website images](docs/IMAGE-UPDATES.md)
+- [Set up the Discord website manager](docs/WEBSITE-MANAGER-SETUP.md)
 - [Production readiness check](docs/PRODUCTION-CHECKLIST.md)
 
 ## One-time setup

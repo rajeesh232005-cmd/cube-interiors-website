@@ -15,6 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - run: node caretaker/validate-site.mjs
+      - name: Check browser and manager scripts
+        shell: bash
+        run: |
+          node --check dist/site.js
+          node --check dist/manager.js
+          node --input-type=module --check < 'functions/api/[[path]].js'
+          node caretaker/validate-manager.mjs
       - name: Verify simulated failures
         shell: bash
         run: |
