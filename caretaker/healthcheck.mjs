@@ -50,7 +50,7 @@ async function check(site) {
     const result = await checkOnce(site);
     attempts.push({ attempt, checkedAt: new Date().toISOString(), ...result });
     if (result.ok) break;
-    if (attempt < retries) await delay(retryDelay);
+    if (attempt < retries) await delay(retryDelay * (2 ** (attempt - 1)));
   }
   const final = attempts.at(-1);
   return { name: site.name, url: site.url, expectedText: site.expectedText, attempts, ...final };

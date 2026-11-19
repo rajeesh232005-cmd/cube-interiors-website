@@ -19,3 +19,16 @@ header{background:radial-gradient(ellipse at 8% 10%,#e6c5a0a6 0,transparent 43%)
 header.scrolled{box-shadow:0 8px 28px #74472d26,inset 0 1px 0 #ffffffa6}
 header::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,#b17d54aa 35%,#c99972aa 70%,transparent);pointer-events:none}
 @media(max-width:760px){.links.open{background:linear-gradient(125deg,#f5e3d0,#fff7ec 55%,#ecd4bc);box-shadow:0 12px 22px #74472d1a}}
+
+/* Finished footer: directly follows the CTA without an empty band. */
+.home-cta{margin-bottom:0}
+footer{padding:0;background:linear-gradient(115deg,#f2dfca,#fff7ec 52%,#ead1b8);border-top:1px solid #c69d78;color:var(--ink);box-shadow:inset 0 1px 0 #fff9}
+footer .footer{padding:28px 0 12px;align-items:center}
+footer .footer-nav{padding:0 0 28px;align-items:center;gap:22px;font-size:13px}
+footer .footer-nav .instagram-link{margin-right:auto;font-weight:600}
+footer a{text-underline-offset:5px;text-decoration-thickness:1px}
+footer a:hover{color:var(--clay)}
+.not-found{min-height:62vh;display:grid;place-items:center;text-align:center;padding:90px 6%}
+.not-found h1{margin:10px 0 20px}.not-found p{max-width:560px;color:var(--muted)}
+.estimate-float.footer-in-view{opacity:0;transform:translateY(18px);pointer-events:none}
+@media(max-width:760px){footer{padding:0 0 86px}footer .footer{align-items:flex-start;padding-top:24px}footer .footer-nav{align-items:flex-start;flex-direction:column;gap:12px;padding-bottom:24px}footer .footer-nav .instagram-link{margin-right:0}.not-found{min-height:55vh;padding-block:65px}}
