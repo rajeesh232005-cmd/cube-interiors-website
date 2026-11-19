@@ -2,6 +2,11 @@
 
 Static website and zero-cost caretaker configuration for CUBE Interiors.
 
+## Owner guides
+
+- [How to update website images](docs/IMAGE-UPDATES.md)
+- [Production readiness check](docs/PRODUCTION-CHECKLIST.md)
+
 ## One-time setup
 
 1. Create a GitHub repository and push this project.
