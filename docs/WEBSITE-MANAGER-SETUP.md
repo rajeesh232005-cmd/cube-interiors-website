@@ -56,6 +56,7 @@ environment:
 | `DISCORD_CLIENT_SECRET` | Encrypted secret | Discord Client Secret |
 | `GITHUB_TOKEN` | Encrypted secret | Restricted GitHub token |
 | `SESSION_SECRET` | Encrypted secret | A new random value of at least 32 characters |
+| `FORM_RECIPIENT` | Encrypted secret | Email address that receives website enquiries |
 
 Optional settings:
 
@@ -90,3 +91,4 @@ new secrets are available to the server function.
   four hours.
 - OAuth state checking protects the Discord sign-in flow.
 - GitHub and Discord credentials remain only in encrypted Cloudflare secrets.
+- The contact recipient is hidden from website visitors and can be changed without editing the site.

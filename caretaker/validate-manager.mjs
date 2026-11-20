@@ -7,8 +7,8 @@ const configured = {
   DISCORD_MANAGER_ROLE_ID: 'test', GITHUB_TOKEN: 'test', SESSION_SECRET: 'a'.repeat(40)
 };
 
-const call = (path, method = 'GET', env = configured, headers = {}) => manager.onRequest({
-  request: new Request(`https://example.com/api/${path.join('/')}`, { method, headers, body: method === 'GET' ? undefined : '{}' }),
+const call = (path, method = 'GET', env = configured, headers = {}, body = '{}') => manager.onRequest({
+  request: new Request(`https://example.com/api/${path.join('/')}`, { method, headers, body: method === 'GET' ? undefined : body }),
   env,
   params: { path }
 });
@@ -21,4 +21,16 @@ const rejectedWrite = await call(['projects'], 'POST');
 if (rejectedWrite.status !== 403) throw new Error(`Expected missing-origin 403, got ${rejectedWrite.status}`);
 const unauthenticatedWrite = await call(['projects'], 'POST', configured, { Origin: 'https://example.com' });
 if (unauthenticatedWrite.status !== 401) throw new Error(`Expected unauthenticated 401, got ${unauthenticatedWrite.status}`);
+const rejectedEnquiry = await call(['enquiry'], 'POST');
+if (rejectedEnquiry.status !== 403) throw new Error(`Expected enquiry missing-origin 403, got ${rejectedEnquiry.status}`);
+const unconfiguredEnquiry = await call(['enquiry'], 'POST', configured, { Origin: 'https://example.com' });
+if (unconfiguredEnquiry.status !== 503) throw new Error(`Expected missing recipient 503, got ${unconfiguredEnquiry.status}`);
+const honeypotEnquiry = await call(
+  ['enquiry'],
+  'POST',
+  { ...configured, FORM_RECIPIENT: 'hidden@example.com' },
+  { Origin: 'https://example.com', 'Content-Type': 'application/json' },
+  JSON.stringify({ _honey: 'spam' })
+);
+if (honeypotEnquiry.status !== 200) throw new Error(`Expected honeypot success 200, got ${honeypotEnquiry.status}`);
 console.log('Manager security checks passed.');

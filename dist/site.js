@@ -52,14 +52,42 @@ if (form) {
     const invalid = value && (!/^[+()0-9 .-]+$/.test(value) || digits.length < 7 || digits.length > 15);
     input.setCustomValidity(invalid ? 'Enter a phone number with 7 to 15 digits.' : '');
   }));
-  form.addEventListener('submit', event => {
-    for (const input of form.querySelectorAll('input[required]')) {
-      if (!input.value.trim()) {
-        input.value = '';
-        event.preventDefault();
-        input.reportValidity();
-        break;
-      }
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const status = document.getElementById('form-status');
+    const button = form.querySelector('.form-submit');
+    if (!form.reportValidity()) return;
+
+    const originalButton = button.innerHTML;
+    button.disabled = true;
+    button.textContent = 'Sending enquiry…';
+    status.className = 'form-status is-sending';
+    status.textContent = 'Sending your enquiry securely…';
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        credentials: 'same-origin',
+        signal: controller.signal
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'The enquiry could not be sent.');
+      form.reset();
+      status.className = 'form-status is-success';
+      status.textContent = 'Thank you. Your enquiry has been sent to CUBE.';
+    } catch (error) {
+      status.className = 'form-status is-error';
+      status.textContent = error.name === 'AbortError'
+        ? 'Sending took too long. Please try again, or call CUBE.'
+        : (error.message || 'We could not send your enquiry. Please try again, or call CUBE.');
+    } finally {
+      clearTimeout(timeout);
+      button.disabled = false;
+      button.innerHTML = originalButton;
     }
   });
 }

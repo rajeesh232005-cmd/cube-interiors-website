@@ -1,6 +1,12 @@
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const allowedCategories = new Set(['residential', 'kitchens', 'commercial']);
+const allowedEnquiryServices = new Set([
+  'Residential interiors',
+  'Commercial spaces',
+  'Modular kitchen',
+  'Renovation & consultation'
+]);
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
   status,
@@ -188,6 +194,70 @@ function requireSameOrigin(request) {
   if (!origin || origin !== new URL(request.url).origin) throw Object.assign(new Error('Request origin was rejected.'), { status: 403 });
 }
 
+function validPhone(value) {
+  const digits = value.replace(/\D/g, '');
+  return /^[+()0-9 .-]+$/.test(value) && digits.length >= 7 && digits.length <= 15;
+}
+
+async function handleEnquiry(context) {
+  requireSameOrigin(context.request);
+  if (!context.env.FORM_RECIPIENT) return json({ error: 'The contact form is being configured. Please call or email CUBE.' }, 503);
+
+  const input = await context.request.json();
+  const honey = cleanText(input._honey, 200);
+  if (honey) return json({ ok: true });
+
+  const name = cleanText(input.name, 100, true);
+  const phone = cleanText(input.phone, 20, true);
+  const alternativePhone = cleanText(input.alternative_phone, 20);
+  const email = cleanText(input.email, 200, true).toLowerCase();
+  const projectLocation = cleanText(input.project_location, 200, true);
+  const service = cleanText(input.service, 80, true);
+  const message = cleanText(input.message, 3000);
+
+  if (!validPhone(phone) || (alternativePhone && !validPhone(alternativePhone))) {
+    throw Object.assign(new Error('Enter a valid phone number with 7 to 15 digits.'), { status: 400 });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw Object.assign(new Error('Enter a valid email address.'), { status: 400 });
+  }
+  if (!allowedEnquiryServices.has(service)) {
+    throw Object.assign(new Error('Choose a valid service.'), { status: 400 });
+  }
+  if (input.contact_consent !== 'Agreed') {
+    throw Object.assign(new Error('Please agree to be contacted about this enquiry.'), { status: 400 });
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(context.env.FORM_RECIPIENT)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        name,
+        phone,
+        alternative_phone: alternativePhone || 'Not provided',
+        email,
+        project_location: projectLocation,
+        service,
+        message: message || 'Not provided',
+        contact_consent: 'Agreed',
+        _subject: 'New CUBE website project enquiry',
+        _template: 'table',
+        _url: `${new URL(context.request.url).origin}/contact.html`
+      }),
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (!response.ok) throw Object.assign(new Error('The enquiry service did not accept the request.'), { status: 502 });
+  return json({ ok: true });
+}
+
 async function currentUser(context) {
   const token = cookies(context.request).cube_manager_session;
   return readSession(context.env.SESSION_SECRET, token);
@@ -364,6 +434,7 @@ export async function onRequest(context) {
       const missing = missingConfig(context.env);
       return missing.length ? html('Manager setup required', `Cloudflare is missing: ${missing.join(', ')}.`, 503) : handleCallback(context);
     }
+    if (path[0] === 'enquiry' && context.request.method === 'POST') return await handleEnquiry(context);
 
     const missing = missingConfig(context.env);
     if (missing.length) return json({ error: 'Manager setup is incomplete.', missing }, 503);
@@ -381,6 +452,7 @@ export async function onRequest(context) {
     return json({ error: 'Not found.' }, 404);
   } catch (error) {
     const status = Number(error.status) || 500;
-    return json({ error: status >= 500 ? 'The manager could not complete this request.' : error.message }, status);
+    const isEnquiry = (Array.isArray(context.params.path) ? context.params.path : [context.params.path]).filter(Boolean)[0] === 'enquiry';
+    return json({ error: status >= 500 ? (isEnquiry ? 'We could not send your enquiry right now. Please call or email CUBE.' : 'The manager could not complete this request.') : error.message }, status);
   }
 }
