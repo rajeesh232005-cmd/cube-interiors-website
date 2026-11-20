@@ -20,9 +20,10 @@ than being added as unnecessary complexity.
 - Git history and Cloudflare deployments provide recoverable versions. The
   rollback is limited to site-only changes and keeps an incident audit trail.
   This covers 13, 34, 55, 56, 58, 59, 60, 73, 78, 79, and 102 for this project.
-- The contact form uses HTTPS FormSubmit delivery, required fields, browser-side
-  validation, honeypot protection, and a success redirect. FormSubmit performs the
-  server-side handling. This covers the applicable parts of 7, 8, 39, and 41.
+- The contact form uses HTTPS Web3Forms delivery through a same-origin server
+  endpoint, required fields, browser and server validation, honeypot protection,
+  timeouts, and inline status feedback. This covers the applicable parts of 7, 8,
+  18, 39, and 41.
 - Security headers include a strict Content Security Policy, clickjacking
   protection, MIME sniffing protection, referrer controls, restricted browser
   permissions, and HSTS. This covers 31, 32, 33, 74, and 81 through 87 where
@@ -49,8 +50,8 @@ than being added as unnecessary complexity.
 
 ## Owner checks before the final public launch
 
-1. Replace the temporary test recipient with `cubeinteriorsukl@gmail.com` and have
-   the client approve the FormSubmit activation email.
+1. Replace the temporary Web3Forms access key with one linked to
+   `cubeinteriorsukl@gmail.com` and confirm it with the client.
 2. Add the final custom domain in Cloudflare when the client supplies it, then
    update the sitemap URL and run the live check once more.
 3. Keep two-factor authentication enabled on the GitHub and Cloudflare owner

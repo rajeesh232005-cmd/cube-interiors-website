@@ -28,9 +28,32 @@ if (unconfiguredEnquiry.status !== 503) throw new Error(`Expected missing recipi
 const honeypotEnquiry = await call(
   ['enquiry'],
   'POST',
-  { ...configured, FORM_RECIPIENT: 'hidden@example.com' },
+  { ...configured, WEB3FORMS_ACCESS_KEY: 'test-access-key' },
   { Origin: 'https://example.com', 'Content-Type': 'application/json' },
   JSON.stringify({ _honey: 'spam' })
 );
 if (honeypotEnquiry.status !== 200) throw new Error(`Expected honeypot success 200, got ${honeypotEnquiry.status}`);
+
+const originalFetch = globalThis.fetch;
+let forwardedEnquiry;
+globalThis.fetch = async (url, options) => {
+  if (url !== 'https://api.web3forms.com/submit') throw new Error(`Unexpected enquiry destination: ${url}`);
+  forwardedEnquiry = JSON.parse(options.body);
+  return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+};
+const deliveredEnquiry = await call(
+  ['enquiry'],
+  'POST',
+  { ...configured, WEB3FORMS_ACCESS_KEY: 'test-access-key' },
+  { Origin: 'https://example.com', 'Content-Type': 'application/json' },
+  JSON.stringify({
+    name: 'Test User', phone: '+91 98765 43210', alternative_phone: '', email: 'test@example.com',
+    project_location: 'Kannur', service: 'Residential interiors', message: 'Test enquiry', contact_consent: 'Agreed'
+  })
+);
+globalThis.fetch = originalFetch;
+if (deliveredEnquiry.status !== 200) throw new Error(`Expected delivered enquiry 200, got ${deliveredEnquiry.status}`);
+if (forwardedEnquiry.access_key !== 'test-access-key' || forwardedEnquiry.subject !== 'New CUBE website project enquiry') {
+  throw new Error('Web3Forms payload was not forwarded correctly.');
+}
 console.log('Manager security checks passed.');

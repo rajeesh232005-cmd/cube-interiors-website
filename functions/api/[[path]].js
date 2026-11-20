@@ -201,7 +201,7 @@ function validPhone(value) {
 
 async function handleEnquiry(context) {
   requireSameOrigin(context.request);
-  if (!context.env.FORM_RECIPIENT) return json({ error: 'The contact form is being configured. Please call or email CUBE.' }, 503);
+  if (!context.env.WEB3FORMS_ACCESS_KEY) return json({ error: 'The contact form is being configured. Please call or email CUBE.' }, 503);
 
   const input = await context.request.json();
   const honey = cleanText(input._honey, 200);
@@ -231,11 +231,15 @@ async function handleEnquiry(context) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   let response;
+  let result;
   try {
-    response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(context.env.FORM_RECIPIENT)}`, {
+    response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
+        access_key: context.env.WEB3FORMS_ACCESS_KEY,
+        subject: 'New CUBE website project enquiry',
+        from_name: 'CUBE Website',
         name,
         phone,
         alternative_phone: alternativePhone || 'Not provided',
@@ -244,17 +248,16 @@ async function handleEnquiry(context) {
         service,
         message: message || 'Not provided',
         contact_consent: 'Agreed',
-        _subject: 'New CUBE website project enquiry',
-        _template: 'table',
-        _url: `${new URL(context.request.url).origin}/contact.html`
+        page_url: `${new URL(context.request.url).origin}/contact.html`
       }),
       signal: controller.signal
     });
+    result = await response.json().catch(() => null);
   } finally {
     clearTimeout(timeout);
   }
 
-  if (!response.ok) throw Object.assign(new Error('The enquiry service did not accept the request.'), { status: 502 });
+  if (!response.ok || !result?.success) throw Object.assign(new Error('The enquiry service did not accept the request.'), { status: 502 });
   return json({ ok: true });
 }
 
